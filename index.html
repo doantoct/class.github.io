@@ -1,680 +1,1013 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ricerca Documentale</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ricerca Documentale</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-italia@2.8.0/dist/css/bootstrap-italia.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-<style>
+  <style>
+    :root{
+      --bg:#f3f5f8;
+      --brand:#0b75ff;
+      --pillCat:#1f9d4c;
+      --pillCls:#14a3b8;
+      --border:#e7ebf0;
+      --shadow: 0 10px 22px rgba(0,0,0,.08);
+      --logoWidth: 120px;
+    }
 
-/* ===== LOGIN PERFETTAMENTE CENTRATO ===== */
+    body{ background:var(--bg); }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f9;
-    margin: 0;
-}
+    /* ===== LOGO ===== */
+    .logo-wrap{ margin:0 auto 14px; text-align:center; }
+    .logo-link{ display:inline-block; text-decoration:none; outline:none; border:none; }
+    .logo-link:focus,.logo-link:active,.logo-link:focus-visible{ outline:none !important; box-shadow:none !important; }
+    .logo-img{
+      width: var(--logoWidth);
+      height:auto;
+      display:block;
+      transition: transform .25s ease, filter .25s ease;
+    }
+    .logo-link:hover .logo-img{
+      transform: translateY(-6px) scale(1.05);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.15));
+    }
 
-/* Centra tutto nello schermo */
-#loginPage {
+    /* ===== LOGIN ===== */
+    .login-wrap{ max-width:520px; margin:10vh auto 0; padding:0 12px; }
+    .login-card{
+      background:#fff; border:1px solid var(--border); border-radius:14px;
+      box-shadow: var(--shadow); padding:18px;
+    }
+    .login-title{ font-size:22px; font-weight:900; margin:6px 0 12px; color:#1f2a37; text-align:center; }
+    .login-sub{ text-align:center; color:#6b7280; font-size:14px; margin-bottom:14px; }
+    .input-lg{ height:58px; border-radius:8px !important; font-size:18px; padding-left:16px; background:#fff; }
+    .login-actions .btn{
+      height:54px; border-radius:10px; font-weight:900; font-size:18px;
+      background:var(--brand); border:1px solid var(--brand);
+    }
+    .login-status{ margin-top:10px; font-size:13px; }
 
-    max-width: 900px;
-    margin: auto;        /* stesso centraggio ricerca */
-    padding-top: 10px;   /* stessa altezza ricerca */
+    /* ===== TOPBAR ===== */
+    .topbar{
+      max-width:1240px; margin:16px auto 0; padding:0 12px;
+      display:flex; align-items:center; justify-content:flex-end; gap:12px;
+    }
+    .topbar-user{
+      display:flex; align-items:center; gap:10px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding: 8px 10px;
+      box-shadow: var(--shadow);
+      font-weight:800;
+      color:#111827;
+      max-width:100%;
+    }
+    .topbar-user .who{
+      font-weight:900;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 70vw;
+    }
+    .btn-logout{
+      border-radius:999px;
+      font-weight:900;
+      padding: 6px 10px;
+      white-space:nowrap;
+    }
 
-}
+    /* ===== HERO ===== */
+    .hero{ max-width:1240px; margin:0 auto; text-align:center; padding:24px 12px 0; }
+    h1{ font-size:clamp(24px,2.6vw,38px); font-weight:900; margin:0 0 14px; color:#1f2a37; }
 
-/* Logo e titolo */
-#loginPage .header {
-    text-align: center;
-    margin-bottom: 20px;
-}
+    /* ===== SEARCH ===== */
+    .search-area{ max-width:1240px; margin:0 auto; padding:0 12px 8px; }
+    .ac-wrap{ position:relative; }
+    .btn-search{
+      height:54px; border-radius:8px; width:100%;
+      font-weight:900; font-size:18px; background:var(--brand); border:1px solid var(--brand);
+    }
+    .meta{ color:#6b7280; font-size:13px; margin-top:8px; }
+    .status{ margin-top:6px; font-size:13px; }
 
-/* Card login */
-.login-card {
-    background: #e9e9e9;
-    padding: 30px;
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.10);
-    width: 420px;
-    max-width: 90%;
-}
+    /* ===== RESULTS ===== */
+    .results-area{ max-width:1240px; margin:10px auto 10px; }
+    .result-row{
+      background:#fff; border:1px solid var(--border); border-radius:14px;
+      margin:0 8px 10px; padding:10px 12px;
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      box-shadow: var(--shadow);
+      transition: background .15s ease;
+    }
+    .result-row:hover{ background:#fbfcff; }
 
-/* Titolo */
-.login-title {
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 25px;
-}
+    .pill{
+      display:inline-flex; align-items:center;
+      padding:6px 12px; border-radius:999px;
+      color:#fff; font-weight:900; line-height:1; font-size:14px; white-space:nowrap;
+    }
+    .pill-cat{ background:var(--pillCat); }
+    .pill-cls{ background:var(--pillCls); }
 
-/* Campi input */
-.login-card input {
+    .spacer{ flex: 1 1 auto; }
+    .btn-info-mini{
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
 
-    width: 100%;
-    box-sizing: border-box;
+    .nores{
+      background:#fff; border:1px solid var(--border); border-radius:14px;
+      margin:0 8px 10px; padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap; box-shadow: var(--shadow);
+    }
+    .nores .btn{ padding:8px 12px; font-weight:900; border-radius:8px; }
 
-    padding: 14px 16px;
+    /* ===== AUTOCOMPLETE ===== */
+    .ac-panel{
+      position:absolute; left:0; right:0; top: calc(100% + 6px);
+      background:#fff; border:1px solid var(--border); border-radius:12px;
+      box-shadow: var(--shadow); z-index:50;
+      display:none; max-height:280px; overflow:auto;
+    }
+    .ac-item{ padding:10px 12px; font-size:15px; cursor:pointer; border-bottom:1px solid #f1f3f6; }
+    .ac-item:last-child{ border-bottom:0; }
+    .ac-item:hover, .ac-item.active{ background:#f3f7ff; }
+    .ac-muted{ color:#6b7280; font-size:12px; margin-top:2px; }
+    .ac-bold{ font-weight:900; }
+    .hl{ background:#fff3cd; border-radius:4px; padding:0 2px; }
 
-    border-radius: 8px;
-    border: 1px solid #bbb;
+    /* ===== POPUP (scrollabile) ===== */
+    .modal-backdrop-custom{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.45);
+      display:none;
+      z-index: 1000;
+      padding: 18px;
+    }
+    .modal-card{
+      width: min(920px, 100%);
+      margin: 6vh auto 0;
+      background:#fff;
+      border-radius:14px;
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      max-height: 88vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-head{
+      padding: 12px 14px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap:10px;
+      border-bottom: 1px solid #eef2f6;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+    .modal-body{
+      padding: 14px;
+      font-size: 15px;
+      overflow:auto;
+      flex: 1 1 auto;
+    }
+    .kv{
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border:1px solid #eef2f6;
+      border-radius:12px;
+      background:#fafbfd;
+    }
+    .kv .k{ color:#6b7280; font-size:12px; font-weight:800; }
+    .kv .v{ font-size:16px; font-weight:900; color:#111827; }
+    .modal-close{
+      border-radius:999px;
+      padding: 6px 10px;
+      font-weight:900;
+    }
 
-    font-size: 16px;
-    margin-bottom: 15px;
+    .mini-table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid #eef2f6;
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+      margin-top:10px;
+    }
+    .mini-table th, .mini-table td{
+      padding:10px 12px;
+      border-bottom:1px solid #eef2f6;
+      vertical-align:top;
+      font-size:14px;
+    }
+    .mini-table th{
+      background:#fafbfd;
+      font-weight:900;
+      color:#111827;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .mini-table tr:last-child td{ border-bottom:0; }
 
-}
+    /* ===== ESEMPI (CENTRATI) ===== */
+    .examples-section{
+      max-width:1240px;
+      margin: 10px auto 40px;
+      padding: 0 12px;
+    }
+    .examples-container{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      box-shadow: var(--shadow);
+      text-align:center; /* ✅ tutto centrato */
+    }
+    .examples-head{
+      display:flex;
+      justify-content:center; /* ✅ titolo centrato */
+      margin-bottom:12px;
+    }
+    .examples-main-title{
+      font-size:20px;
+      font-weight:900;
+      margin:0;
+      color:#1f2a37;
+      text-align:center;
+      width:100%;
+    }
 
-/* Bottone */
-.login-card button {
+    .examples-empty{
+      color:#6b7280;
+      font-size:14px;
+    }
 
-    width: 100%;
-    box-sizing: border-box;
+    .examples-group{
+      margin: 0 auto 14px;
+      padding-bottom:14px;
+      border-bottom:1px solid #eef2f6;
+      max-width: 920px; /* leggibile anche centrato */
+      text-align:left;  /* ✅ contenuto in colonna leggibile */
+    }
+    .examples-group:last-child{
+      margin-bottom:0;
+      padding-bottom:0;
+      border-bottom:0;
+    }
+    .examples-fascicolo{
+      font-weight:900;
+      margin-bottom:6px;
+    }
+    .examples-sotto ul{
+      margin: 0;
+      padding-left: 18px;
+    }
+    .examples-sotto li{
+      margin: 2px 0;
+      color:#6b7280;
+      font-size:14px;
+    }
 
-    padding: 14px;
-
-    border-radius: 8px;
-    font-size: 18px;
-
-    background: #1976d2;
-}
-
-/* Messaggi */
-.error, .success {
-
-    width: 100%;
-    box-sizing: border-box;
-}
-
-
-
-
-
-
-/* ===== STILE GENERALE ===== */
-body {
-  font-family: Arial, sans-serif;
-  padding: 15px;
-  background: #f4f6f9;
-}
-h2 {
-  text-align: center;
-  color: #333;
-}
-.header {
-    text-align: center;
-    margin-top: 10px;    /* stessa posizione ricerca */
-    margin-bottom: 15px;
-}
-.logo {
-  max-width: 120px;
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-.logo:hover {
-  opacity: 0.8;
-  transform: scale(1.05);
-  transition: 0.2s;
-}
-input, button {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-input {
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:active { background: #0056b3; }
-
-/* ===== STILE RISULTATI ===== */
-.gruppo {
-  background: white;
-  padding: 14px;
-  margin-top: 10px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-.record {
-  background: white;
-  padding: 14px;
-  margin-top: 12px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-}
-.record:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  transition: 0.2s;
-}
-.gruppo-dettaglio {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 16px;
-  border-radius: 12px;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 15px;
-}
-.badge-container {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
-.badge {
-  padding: 4px 8px;
-  font-size: 14px;
-  border-radius: 20px;
-  font-weight: bold;
-}
-.categoria { background: #28a745; color: white; }
-.classe { background: #17a2b8; color: white; }
-.label { font-weight: bold; color: #444; }
-.bottoni-dettaglio {
-  display: flex;
-  gap: 10px;
-  margin-top: 15px;
-}
-.bottoni-dettaglio button { flex: 1; }
-
-/* ===== STILE TITOLO ESEMPI ===== */
-.titolo-esempi {
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  color: white;
-  padding: 18px;
-  border-radius: 14px;
-  margin-bottom: 20px;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-}
-.titolo-esempi h3 {
-  margin: 0 0 10px 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-.badge-titolo {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0 6px;
-  text-transform: uppercase;
-}
-.badge-cat { background: #28a745; }
-.badge-cl { background: #17a2b8; }
-
-/* ===== LOGIN ===== */
-#loginPage {
-  max-width: 420px;
-  margin: 40px auto;
-}
-.login-card {
-  background: white;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.10);
-}
-.login-title {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 14px;
-}
-.login-hint {
-  font-size: 13px;
-  color: #555;
-  margin-top: 6px;
-  text-align: center;
-}
-.error {
-  background: #ffe5e5;
-  color: #b30000;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  display: none;
-}
-.success {
-  background: #e8ffe8;
-  color: #146b14;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  display: none;
-}
-
-/* Centra input + bottone della ricerca */
-.search-container{
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-#appPage input, 
-#appPage button{
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* App nascosta finché non fai login */
-#appPage { display: none; }
-</style>
+    @media (max-width:576px){
+      .pill{ font-size:13px; padding:6px 10px; }
+      .btn-info-mini{ width:100%; justify-content:center; }
+      .spacer{ display:none; }
+      .topbar-user .who{ max-width: 55vw; }
+      .examples-group{ text-align:left; }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- ===================== LOGIN PAGE ===================== -->
-<div id="loginPage">
-  <div class="header">
-    <img src="logo.png" alt="Logo" class="logo" />
-    <h2>Ricerca Documentale</h2>
-  </div>
+  <!-- ===================== LOGIN VIEW ===================== -->
+  <section id="loginView" class="login-wrap" aria-label="Login">
+    <div class="logo-wrap" aria-label="Logo">
+      <a class="logo-link" href="#" aria-label="Logo">
+        <img src="logo.png" alt="Logo" class="logo-img">
+      </a>
+    </div>
 
-  <div class="login-card">
-    <div class="login-title">🔐 Accesso</div>
+    <div class="login-card">
+      <div class="login-title">Accesso</div>
+      <div class="login-sub">Inserisci mail e password per continuare</div>
 
-    <div id="loginError" class="error">Mail o password non valide.</div>
-    <div id="loginSuccess" class="success">Accesso effettuato. ✅</div>
+      <div class="mb-3">
+        <label class="form-label fw-bold" for="loginMail">Mail</label>
+        <input id="loginMail" class="form-control input-lg" type="email" placeholder="nome@dominio.it" autocomplete="username">
+        <div class="form-text">La mail deve contenere <strong>@</strong>.</div>
+      </div>
 
-    <input type="email" id="loginMail" placeholder="Inserisci la tua mail" autocomplete="username" />
-    <input type="password" id="loginPassword" placeholder="Inserisci la password" autocomplete="current-password" />
+      <div class="mb-3">
+        <label class="form-label fw-bold" for="loginPass">Password</label>
+        <input id="loginPass" class="form-control input-lg" type="password" placeholder="Password" autocomplete="current-password">
+      </div>
 
-    <button onclick="login()">Entra</button>
+      <div class="d-grid login-actions">
+        <button id="btnLogin" class="btn btn-primary" type="button">Accedi</button>
+      </div>
 
+      <div id="loginStatus" class="login-status text-danger"></div>
+    </div>
+  </section>
 
-  </div>
-</div>
+  <!-- ===================== APP VIEW ===================== -->
+  <section id="appView" style="display:none;">
+    <div class="topbar" aria-label="Barra utente">
+      <div class="topbar-user">
+        <span class="who" id="loggedWho">—</span>
+        <button id="btnLogout" class="btn btn-outline-primary btn-logout" type="button">Logout</button>
+      </div>
+    </div>
 
-<!-- ===================== APP PAGE ===================== -->
-<div id="appPage">
+    <div class="hero">
+      <div class="logo-wrap" aria-label="Logo">
+        <a class="logo-link" href="index.html" aria-label="Torna alla home">
+          <img src="logo.png" alt="Logo" class="logo-img">
+        </a>
+      </div>
+      <h1>Ricerca Documentale</h1>
+    </div>
 
-  <div class="header">
-    <img src="logo.png" alt="Logo" class="logo" onclick="tornaHome()" />
-    <h2>Ricerca Documentale</h2>
-  </div>
+    <div class="search-area">
+      <div class="ac-wrap">
+        <input id="q" class="form-control input-lg" type="text" placeholder="Inizia a scrivere qui che tipo di documento che devi classificare"
+               autocomplete="off" spellcheck="false">
+        <div id="acPanel" class="ac-panel" role="listbox" aria-label="Suggerimenti Fascicolo"></div>
+      </div>
 
-<div class="search-container">
-<input type="text" id="searchInput" list="fascicoliList"
-  placeholder="Inserisci una o più parole. Per risultati più ampi, ometti l’ultimo carattere (es.: mandato/i → mandat).">
+      <div class="d-grid mt-3">
+        <button id="btnSearch" class="btn btn-primary btn-search" type="button">Cerca</button>
+      </div>
 
-<datalist id="fascicoliList"></datalist>
-  <button onclick="cerca()">Cerca</button>
-</div>
+      <div id="meta" class="meta"></div>
+      <div id="status" class="status text-danger"></div>
+    </div>
 
-  <div id="risultati"></div>
+    <section class="results-area" aria-label="Risultati">
+      <div id="results"></div>
+    </section>
 
-</div>
+    <!-- ✅ ESEMPI CENTRATI (senza badge categoria/classe) -->
+    <section class="examples-section" aria-label="Esempi di fascicolazione">
+      <div class="examples-container">
+        <div class="examples-head">
+          <div class="examples-main-title">Esempi di fascicolazione</div>
+        </div>
+        <div id="examplesContent" class="examples-empty">
+          Passa col mouse (o clicca “Informazioni”) su un risultato per vedere gli esempi.
+        </div>
+      </div>
+    </section>
+
+    <!-- POPUP -->
+    <div id="modalBackdrop" class="modal-backdrop-custom" role="dialog" aria-modal="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div id="modalTitle">Informazioni</div>
+          <button id="modalClose" class="btn btn-outline-primary modal-close" type="button">Chiudi</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+  </section>
 
 <script>
-/* =========================================================
-   CONFIG
-========================================================= */
-const FILE_UTENTI = "utenti.xlsx";   // excel con login (mail, password)
-const FILE_DATI   = "uscita.xlsx";   // excel con dati per ricerca
-
-let utenti = [];
-let dati = [];
-let datiCaricati = false;
-let utentiCaricati = false;
-
-/* =========================================================
-   UTILS
-========================================================= */
-function normalizeString(v) {
-  return (v ?? "").toString().trim();
-}
-function normalizeMail(v) {
-  return normalizeString(v).toLowerCase();
-}
-function show(el) { el.style.display = "block"; }
-function hide(el) { el.style.display = "none"; }
-
-/* =========================================================
-   CARICAMENTO EXCEL UTENTI
-========================================================= */
-fetch(FILE_UTENTI)
-  .then(r => {
-    if (!r.ok) throw new Error("Errore caricamento utenti.xlsx");
-    return r.arrayBuffer();
-  })
-  .then(buf => {
-    const wb = XLSX.read(buf, { type: "array" });
-    const sh = wb.Sheets[wb.SheetNames[0]];
-    utenti = XLSX.utils.sheet_to_json(sh);
-    utentiCaricati = true;
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Errore nel caricamento di utenti.xlsx (controlla nome file e che sia nella stessa cartella).");
-  });
-
-/* =========================================================
-   CARICAMENTO EXCEL DATI (la tua ricerca)
-========================================================= */
-fetch(FILE_DATI)
-  .then(r => {
-    if (!r.ok) throw new Error("Errore caricamento uscita.xlsx");
-    return r.arrayBuffer();
-  })
-  .then(buf => {
-    const wb = XLSX.read(buf, { type: "array" });
-    const sh = wb.Sheets[wb.SheetNames[0]];
-    dati = XLSX.utils.sheet_to_json(sh);
-    datiCaricati = true;
-
-    // ✅ crea suggerimenti per l'input dalla colonna FASCICOLO
-    buildFascicoliDatalist();
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Errore nel caricamento del file Excel uscita.xlsx");
-  });
-
-/* =========================================================
-   LOGIN
-========================================================= */
-document.getElementById("loginPassword").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") login();
-});
-document.getElementById("loginMail").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") login();
-});
-
-function login() {
-  const errBox = document.getElementById("loginError");
-  const okBox  = document.getElementById("loginSuccess");
-  hide(errBox); hide(okBox);
-
-  if (!utentiCaricati) {
-    alert("Attendi: sto caricando utenti.xlsx...");
-    return;
+  /***********************
+   * UTILS
+   ***********************/
+  function escapeHtml(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
-  if (!datiCaricati) {
-    alert("Attendi: sto caricando uscita.xlsx...");
-    return;
+  function normalize(s){ return (s ?? "").toString().toLowerCase().trim(); }
+  function splitTerms(q){ return q.split(/[,]+|\s+/g).map(t=>t.trim()).filter(Boolean); }
+  function isValidEmailBasic(s){
+    return typeof s === "string" && s.includes("@") && s.indexOf("@") > 0 && s.indexOf("@") < s.length - 1;
   }
 
-  const mail = normalizeMail(document.getElementById("loginMail").value);
-  const pass = normalizeString(document.getElementById("loginPassword").value);
-  
-  // Controllo formato mail
-if (!mail.includes("@")) {
+  /***********************
+   * LOGIN
+   ***********************/
+  const loginView = document.getElementById("loginView");
+  const appView   = document.getElementById("appView");
+  const loginMail = document.getElementById("loginMail");
+  const loginPass = document.getElementById("loginPass");
+  const btnLogin  = document.getElementById("btnLogin");
+  const loginStatus = document.getElementById("loginStatus");
 
-    show(errBox);
-    errBox.textContent = "Inserisci una mail valida (deve contenere @)";
+  const loggedWhoEl = document.getElementById("loggedWho");
+  const btnLogout = document.getElementById("btnLogout");
 
-    return;
-}
+  let utentiRows = null;
 
-  if (!mail || !pass) {
-    show(errBox);
-    errBox.textContent = "Inserisci mail e password.";
-    return;
+  function showApp(user){
+    loginView.style.display = "none";
+    appView.style.display = "block";
+
+    const ente = (user["Ente"] ?? user["ENTE"] ?? "").toString().trim();
+    const nome = (user["Nome"] ?? user["NOME"] ?? "").toString().trim();
+    const cognome = (user["Cognome"] ?? user["COGNOME"] ?? "").toString().trim();
+
+    const label = [ente, (nome + " " + cognome).trim()].filter(Boolean).join(" - ");
+    loggedWhoEl.textContent = label || "Utente";
+
+    sessionStorage.setItem("authUser", JSON.stringify({ ente, nome, cognome }));
   }
 
-  // Cerca match su Excel (colonne: mail, password)
-  const trovato = utenti.some(u => {
-    const m = normalizeMail(u["mail"]);
-    const p = normalizeString(u["password"]);
-    return m === mail && p === pass;
-  });
-
-  if (!trovato) {
-    show(errBox);
-    errBox.textContent = "Mail o password non valide.";
-    return;
+  function showLogin(){
+    appView.style.display = "none";
+    loginView.style.display = "block";
+    loggedWhoEl.textContent = "—";
+    sessionStorage.removeItem("authUser");
   }
 
-  show(okBox);
+  async function loadUtentiXlsx(){
+    if(utentiRows) return utentiRows;
 
-  // Mostra app
-  document.getElementById("loginPage").style.display = "none";
-  document.getElementById("appPage").style.display = "block";
+    const res = await fetch("utenti.xlsx", { cache:"no-store" });
+    if(!res.ok) throw new Error("HTTP " + res.status);
 
-  // Focus ricerca
-  setTimeout(() => {
-    document.getElementById("searchInput").focus();
-  }, 100);
-}
+    const buf = await res.arrayBuffer();
+    const wb = XLSX.read(buf, { type:"array" });
 
-/* =========================================================
-   APP: HOME
-========================================================= */
-function tornaHome() {
-  // Semplice reset vista app
-  document.getElementById("searchInput").value = "";
-  document.getElementById("risultati").innerHTML = "";
-}
+    const sheetU = wb.SheetNames.find(n => n.toLowerCase().trim() === "utenti") || wb.SheetNames[0];
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetU], { defval:"" });
 
-/* =========================================================
-   INVIO CON ENTER (RICERCA)
-========================================================= */
-document.getElementById("searchInput").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") cerca();
-});
-
-/* =========================================================
-   FUNZIONE RICERCA (come tua)
-========================================================= */
-function cerca() {
-
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const parole = input.split(" ").filter(p => p);
-  const risultatiDiv = document.getElementById("risultati");
-  risultatiDiv.innerHTML = "";
-
-  if (parole.length === 0) return;
-
-  let filtrati = dati.filter(riga => {
-    let fascicolo = (riga["FASCICOLO"] || "").toString().toLowerCase();
-    return parole.every(p => fascicolo.includes(p));
-  });
-
-  // ✅ SE NON TROVA RISULTATI
-  if (!filtrati || filtrati.length === 0) {
-    risultatiDiv.innerHTML = `
-      <div class="record" style="text-align:center;">
-        <div style="font-weight:bold; margin-bottom:10px; font-size:18px;">
-          Nessun risultato trovato <br>
-        </div>
-        <div style="margin-top:10px;">
-          <a href="https://immediaspa.com/area_clienti/"
-             target="_blank"
-             style="color:#007bff; font-weight:bold;">
-             contatta il nostro consulete
-          </a>
-        </div>
-      </div>
-    `;
-    return;
+    utentiRows = rows;
+    return rows;
   }
 
-  let gruppi = {};
+  function findUserByCredentials(rows, email, password){
+    const e = normalize(email);
+    const p = (password ?? "").toString();
 
-  filtrati.forEach(riga => {
-    let descrizione = riga["DESCRIZIONE CLASSE"] || "Senza descrizione";
-    if (!gruppi[descrizione]) gruppi[descrizione] = [];
-    gruppi[descrizione].push(riga);
-  });
-
-  for (let descrizione in gruppi) {
-    let divGruppo = document.createElement("div");
-    divGruppo.className = "gruppo";
-    divGruppo.innerText = descrizione;
-    divGruppo.onclick = function() {
-      mostraDettaglio(descrizione, gruppi[descrizione]);
-    };
-    risultatiDiv.appendChild(divGruppo);
-  }
-}
-
-/* =========================================================
-   DETTAGLIO (come tua)
-========================================================= */
-function mostraDettaglio(descrizione, records) {
-
-  const risultatiDiv = document.getElementById("risultati");
-  risultatiDiv.innerHTML = "";
-
-  let headerBox = document.createElement("div");
-  headerBox.className = "gruppo-dettaglio";
-  headerBox.innerText = descrizione;
-  risultatiDiv.appendChild(headerBox);
-
-  let unici = {};
-
-  records.forEach(riga => {
-    let chiave = (riga["Tipologia"] || "") + "|" + (riga["Durata"] || "");
-    if (!unici[chiave]) unici[chiave] = riga;
-  });
-
-  for (let chiave in unici) {
-    let item = unici[chiave];
-
-    let divRecord = document.createElement("div");
-    divRecord.className = "record";
-
-    divRecord.innerHTML = `
-      <div class="badge-container">
-        <div class="badge categoria">Categoria: ${item["Categoria"] ?? ""}</div>
-        <div class="badge classe">Classe: ${item["Classe"] ?? ""}</div>
-      </div>
-      <div><span class="label">Tipologia documentaria:</span> ${item["Tipologia"] ?? ""}</div>
-      <div><span class="label">Conservazione:</span> ${item["Durata"] ?? ""}</div>
-    `;
-
-    risultatiDiv.appendChild(divRecord);
+    return rows.find(r => {
+      const m = normalize(r["mail"] ?? r["MAIL"] ?? r["Mail"] ?? r["EMAIL"] ?? r["email"]);
+      const pw = (r["password"] ?? r["PASSWORD"] ?? r["Password"] ?? r["PASS"] ?? r["pass"] ?? "").toString();
+      return m === e && pw === p;
+    }) || null;
   }
 
-  let contenitoreBottoni = document.createElement("div");
-  contenitoreBottoni.className = "bottoni-dettaglio";
+  async function doLogin(){
+    loginStatus.textContent = "";
+    const email = (loginMail.value || "").trim();
+    const pass  = (loginPass.value || "").toString();
 
-  let bottoneIndietro = document.createElement("button");
-  bottoneIndietro.innerText = "← Torna ai gruppi";
-  bottoneIndietro.onclick = cerca;
+    if(!email || !pass){
+      loginStatus.textContent = "Inserisci mail e password.";
+      return;
+    }
+    if(!isValidEmailBasic(email)){
+      loginStatus.textContent = "Mail non valida: deve contenere il carattere '@'.";
+      return;
+    }
 
-  let bottoneEsempi = document.createElement("button");
-  bottoneEsempi.innerText = "Mostra esempi";
-  bottoneEsempi.onclick = function() {
-    mostraEsempi(records);
-  };
+    try{
+      const rows = await loadUtentiXlsx();
+      if(!rows.length){
+        loginStatus.textContent = "utenti.xlsx è vuoto o non leggibile.";
+        return;
+      }
 
-  contenitoreBottoni.appendChild(bottoneIndietro);
-  contenitoreBottoni.appendChild(bottoneEsempi);
+      const user = findUserByCredentials(rows, email, pass);
+      if(!user){
+        loginStatus.textContent = "Credenziali non valide.";
+        return;
+      }
 
-  risultatiDiv.appendChild(contenitoreBottoni);
-}
+      showApp(user);
+      await loadDbXlsx();
 
-/* =========================================================
-   MOSTRA ESEMPI (come tua)
-========================================================= */
-function mostraEsempi(records) {
+    }catch(err){
+      console.error(err);
+      loginStatus.textContent = "Errore caricando utenti.xlsx. Apri via http:// (non file://) e metti utenti.xlsx nella stessa cartella.";
+    }
+  }
 
-  const risultatiDiv = document.getElementById("risultati");
-  risultatiDiv.innerHTML = "";
+  btnLogin.addEventListener("click", doLogin);
+  loginMail.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+  loginPass.addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
 
-  if (!records.length) return;
-
-  let categoriaSelezionata = records[0]["Categoria"];
-  let classeSelezionata = records[0]["Classe"];
-
-  // 🔹 Filtra per categoria + classe
-  let filtrati = dati.filter(riga =>
-    riga["Categoria"] === categoriaSelezionata &&
-    riga["Classe"] === classeSelezionata
-  );
-
-  let struttura = {};
-
-  filtrati.forEach(riga => {
-    let fascicolo = (riga["FASCICOLO"] || "Senza fascicolo").toString().trim();
-    let sottofascicolo = (riga["SOTTOFASCICOLO"] || "").toString().trim();
-
-    if (!struttura[fascicolo]) struttura[fascicolo] = new Set();
-
-    if (sottofascicolo !== "") struttura[fascicolo].add(sottofascicolo);
+  btnLogout.addEventListener("click", ()=>{
+    showLogin();
+    // reset UI
+    try{
+      qEl.value = "";
+      clearSearchUI();
+      hideAutocomplete();
+      closeModal();
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Passa col mouse (o clicca “Informazioni”) su un risultato per vedere gli esempi.";
+    }catch(_){}
   });
 
-  // 🔹 Titolo
-  let titolo = document.createElement("div");
-  titolo.className = "titolo-esempi";
-  titolo.innerHTML = `
-    <h3>📂 Esempi di creazione Fascicoli e Sottofascicoli</h3>
-    <div>
-      <span class="badge-titolo badge-cat">Categoria ${categoriaSelezionata ?? ""}</span>
-      <span class="badge-titolo badge-cl">Classe ${classeSelezionata ?? ""}</span>
-    </div>
-  `;
-  risultatiDiv.appendChild(titolo);
+  // Auto-login se in sessione
+  const savedUserStr = sessionStorage.getItem("authUser");
+  if(savedUserStr){
+    const saved = JSON.parse(savedUserStr);
+    showApp(saved);
+  }
 
-  // 🔹 Stampa struttura
-  for (let fascicolo in struttura) {
+  /***********************
+   * APP
+   ***********************/
+  const qEl = document.getElementById("q");
+  const btnSearch = document.getElementById("btnSearch");
+  const metaEl = document.getElementById("meta");
+  const statusEl = document.getElementById("status");
+  const resultsEl = document.getElementById("results");
+  const acPanel = document.getElementById("acPanel");
 
-    let divFascicolo = document.createElement("div");
-    divFascicolo.className = "record";
+  const modalBackdrop = document.getElementById("modalBackdrop");
+  const modalBody = document.getElementById("modalBody");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalClose = document.getElementById("modalClose");
 
-    let html = `
-      <div>
-        <span class="label"> 📁 FASCICOLO:</span>
-        <strong style="text-transform: uppercase;">${fascicolo}</strong>
-      </div>
-    `;
+  const examplesContent = document.getElementById("examplesContent");
 
-    struttura[fascicolo].forEach(sotto => {
-      html += `
-        <div style="margin-left:25px; margin-top:5px;">
-          <span class="label">Sottofascicolo:</span> <em>${sotto.toString().toLowerCase()}</em>
+  let fascicoliRows = null;
+  let tipologiaRows = null;
+
+  // Autocomplete state
+  let fascicoliList = [];
+  let acShown = [];
+  let acActive = -1;
+  let exactMode = false;
+  let lastExactValue = "";
+
+  function clearSearchUI(){
+    resultsEl.innerHTML = "";
+    metaEl.innerHTML = "";
+  }
+
+  function highlight(text, needle){
+    const t = text.toString();
+    const n = needle.toString();
+    if(!n) return escapeHtml(t);
+    const i = t.toLowerCase().indexOf(n.toLowerCase());
+    if(i < 0) return escapeHtml(t);
+    const a = escapeHtml(t.slice(0,i));
+    const b = escapeHtml(t.slice(i, i+n.length));
+    const c = escapeHtml(t.slice(i+n.length));
+    return `${a}<span class="hl">${b}</span>${c}`;
+  }
+
+  function buildFascicoliIndex(allRows){
+    const set = new Set();
+    for(const r of allRows){
+      const v = (r["FASCICOLO"] ?? "").toString().trim();
+      if(v) set.add(v);
+    }
+    fascicoliList = [...set].sort((a,b)=>a.localeCompare(b,"it"));
+  }
+
+  // Autocomplete UI
+  function showAutocomplete(items, typed){
+    acPanel.innerHTML = "";
+    acShown = items;
+    acActive = -1;
+    if(!items.length){ acPanel.style.display = "none"; return; }
+
+    items.forEach((txt, idx)=>{
+      const div = document.createElement("div");
+      div.className = "ac-item";
+      div.setAttribute("role","option");
+      div.dataset.index = idx;
+      div.innerHTML = `
+        <div class="ac-bold">${highlight(txt, typed)}</div>
+        <div class="ac-muted">FASCICOLO</div>
+      `;
+      div.addEventListener("mousedown", (e)=>{
+        e.preventDefault();
+        applyAutocomplete(idx);
+      });
+      acPanel.appendChild(div);
+    });
+
+    acPanel.style.display = "block";
+  }
+
+  function hideAutocomplete(){
+    acPanel.style.display = "none";
+    acPanel.innerHTML = "";
+    acShown = [];
+    acActive = -1;
+  }
+
+  function setActive(idx){
+    const nodes = [...acPanel.querySelectorAll(".ac-item")];
+    nodes.forEach(n => n.classList.remove("active"));
+    if(idx >= 0 && idx < nodes.length){
+      nodes[idx].classList.add("active");
+      acActive = idx;
+      nodes[idx].scrollIntoView({ block:"nearest" });
+    } else {
+      acActive = -1;
+    }
+  }
+
+  function applyAutocomplete(idx){
+    const value = acShown[idx];
+    if(!value) return;
+
+    exactMode = true;
+    lastExactValue = value;
+
+    qEl.value = value;
+    hideAutocomplete();
+    doSearch();
+  }
+
+  function updateAutocomplete(){
+    if(!fascicoliList.length){ hideAutocomplete(); return; }
+
+    const typed = qEl.value.trim();
+    const q = normalize(typed);
+    if(q.length < 2){ hideAutocomplete(); return; }
+
+    const hits = fascicoliList
+      .filter(x => x.toLowerCase().includes(q))
+      .slice(0, 8);
+
+    showAutocomplete(hits, typed);
+  }
+
+  // Group results (unique cat/cls) but keep IND for joins/examples
+  function groupPairsWithInd(matchedRows){
+    const map = new Map();
+    for(const r of matchedRows){
+      const cat = (r["CATEGORIA"] || "(CATEGORIA vuota)").toString().trim();
+      const cls = (r["CLASSE"] || "(CLASSE vuota)").toString().trim();
+      const indCat = (r["IND_CATEGORIA"] || "").toString().trim();
+      const indCls = (r["IND_CLASSE"] || "").toString().trim();
+      const key = cat + "||" + cls;
+
+      if(!map.has(key)){
+        map.set(key, { cat, cls, indCat, indCls });
+      } else {
+        const cur = map.get(key);
+        if(!cur.indCat && indCat) cur.indCat = indCat;
+        if(!cur.indCls && indCls) cur.indCls = indCls;
+      }
+    }
+
+    return [...map.values()].sort((a,b)=>{
+      const c = a.cat.localeCompare(b.cat,"it");
+      if(c!==0) return c;
+      return a.cls.localeCompare(b.cls,"it");
+    });
+  }
+
+  // Modal
+  function openModal(title, html){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = html;
+    modalBackdrop.style.display = "block";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal(){
+    modalBackdrop.style.display = "none";
+    modalBody.innerHTML = "";
+    document.documentElement.style.overflow = "";
+    document.body.style.overflow = "";
+  }
+  modalClose.addEventListener("click", closeModal);
+  modalBackdrop.addEventListener("click", (e)=>{ if(e.target === modalBackdrop) closeModal(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key === "Escape" && modalBackdrop.style.display === "block") closeModal(); });
+
+  // JOIN: fascicoli.IND_* -> tipologia.CATEGORIA/CLASSE (tutte le righe)
+  function findTipologiaAll(indCat, indCls){
+    if(!tipologiaRows || !tipologiaRows.length) return [];
+    const a = normalize(indCat);
+    const b = normalize(indCls);
+    return tipologiaRows.filter(t =>
+      normalize(t["CATEGORIA"]) === a &&
+      normalize(t["CLASSE"]) === b
+    );
+  }
+
+  // ✅ ESEMPI: label Fascicolo/Sottofascicolo, NO "(vuoto)", e titolo centrato
+  function updateExamples(indCat, indCls){
+    if(!fascicoliRows || !fascicoliRows.length){
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Database non caricato.";
+      return;
+    }
+
+    if(!indCat || !indCls){
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "IND_CATEGORIA / IND_CLASSE mancanti: impossibile mostrare esempi.";
+      return;
+    }
+
+    const a = normalize(indCat);
+    const b = normalize(indCls);
+
+    const filtered = fascicoliRows.filter(r =>
+      normalize(r["IND_CATEGORIA"]) === a &&
+      normalize(r["IND_CLASSE"]) === b
+    );
+
+    if(!filtered.length){
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Nessun esempio trovato per questa categoria/classe.";
+      return;
+    }
+
+    // Fascicolo -> Set(sottofascicoli NON vuoti)
+    const map = new Map();
+    for(const r of filtered){
+      const f = (r["FASCICOLO"] ?? "").toString().trim() || "(vuoto)";
+      const s = (r["SOTTOFASCICOLO"] ?? "").toString().trim(); // niente "(SOTTOFASCICOLO vuoto)"
+      if(!map.has(f)) map.set(f, new Set());
+      if(s) map.get(f).add(s);
+    }
+
+    const fascicoli = [...map.keys()].sort((x,y)=>x.localeCompare(y,"it"));
+
+    examplesContent.className = "";
+    examplesContent.innerHTML = fascicoli.map(f=>{
+      const sottos = [...map.get(f)].sort((x,y)=>x.localeCompare(y,"it"));
+
+      // se non ci sono sottofascicoli, stampo solo il fascicolo con label
+      if(!sottos.length){
+        return `
+          <div class="examples-group">
+            <div class="examples-fascicolo"><strong>Fascicolo:</strong> ${escapeHtml(f)}</div>
+          </div>
+        `;
+      }
+
+      const li = sottos.map(s => `<li><strong>Sottofascicolo:</strong> ${escapeHtml(s)}</li>`).join("");
+      return `
+        <div class="examples-group">
+          <div class="examples-fascicolo"><strong>Fascicolo:</strong> ${escapeHtml(f)}</div>
+          <div class="examples-sotto"><ul>${li}</ul></div>
         </div>
       `;
-    });
-
-    divFascicolo.innerHTML = html;
-    risultatiDiv.appendChild(divFascicolo);
+    }).join("");
   }
 
-  // 🔹 Bottone ritorno
-  let bottoneIndietro = document.createElement("button");
-  bottoneIndietro.innerText = "← Torna al dettaglio";
-  bottoneIndietro.onclick = cerca;
+  function buildTipologiaTable(rows){
+    const cols = ["TIPOLOGIA DOCUMENTARIA", "CONSERVAZIONE"];
+    const thead = `<tr>${cols.map(c => `<th>${escapeHtml(c)}</th>`).join("")}</tr>`;
+    const tbody = rows.map(r => {
+      return `<tr>${cols.map(c => `<td>${escapeHtml((r[c] ?? "").toString().trim() || "(vuoto)")}</td>`).join("")}</tr>`;
+    }).join("");
+    return `
+      <table class="mini-table" aria-label="Risultati tipologia">
+        <thead>${thead}</thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    `;
+  }
 
-  risultatiDiv.appendChild(bottoneIndietro);
-}
+  function render(pairs, label){
+    clearSearchUI();
 
-function buildFascicoliDatalist() {
-  const dl = document.getElementById("fascicoliList");
-  if (!dl) return;
+    metaEl.innerHTML = pairs.length
+      ? `Trovati <strong>${pairs.length}</strong> risultati per: <strong>${escapeHtml(label)}</strong>`
+      : "";
 
-  // Prendo tutti i fascicoli unici
-  const set = new Set();
-  dati.forEach(r => {
-    const f = (r["FASCICOLO"] ?? "").toString().trim();
-    if (f) set.add(f);
+    if(!pairs.length){
+      resultsEl.innerHTML = `
+        <div class="nores">
+          <div class="fw-bold">Nessun risultato trovato</div>
+          <a class="btn btn-primary" href="https://immediaspa.com/area_clienti/" target="_blank" rel="noopener">
+            Contatta il nostro consulente
+          </a>
+        </div>
+      `;
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Nessun risultato: passa su un risultato quando disponibile.";
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+
+    pairs.forEach((p)=>{
+      const row = document.createElement("div");
+      row.className = "result-row";
+
+      row.innerHTML = `
+        <div class="pill pill-cat">Categoria: ${escapeHtml(p.cat)}</div>
+        <div class="pill pill-cls">Classe: ${escapeHtml(p.cls)}</div>
+        <div class="spacer"></div>
+        <button class="btn btn-outline-primary btn-info-mini" type="button">Informazioni</button>
+      `;
+
+      row.addEventListener("mouseenter", ()=>{
+        updateExamples(p.indCat, p.indCls);
+      });
+
+      row.querySelector("button").addEventListener("click", ()=>{
+        updateExamples(p.indCat, p.indCls);
+
+        const indCat = (p.indCat || "").toString().trim();
+        const indCls = (p.indCls || "").toString().trim();
+
+        if(!indCat || !indCls){
+          openModal("Informazioni", `
+            <div class="kv">
+              <div class="k">Errore</div>
+              <div class="v">IND_CATEGORIA / IND_CLASSE mancanti per questo record.</div>
+            </div>
+          `);
+          return;
+        }
+
+        const rows = findTipologiaAll(indCat, indCls);
+
+        if(!rows.length){
+          openModal("Informazioni", `
+            <div class="kv">
+              <div class="k">Join</div>
+              <div class="v">Nessuna corrispondenza trovata nella scheda "tipologia"</div>
+            </div>
+            <div class="kv">
+              <div class="k">Parametri usati (JOIN)</div>
+              <div class="v">tipologia.CATEGORIA = ${escapeHtml(indCat)} — tipologia.CLASSE = ${escapeHtml(indCls)}</div>
+            </div>
+          `);
+          return;
+        }
+
+        // deduplica opzionale
+        const uniq = [];
+        const seen = new Set();
+        for(const r of rows){
+          const key = normalize(r["TIPOLOGIA DOCUMENTARIA"]) + "||" + normalize(r["CONSERVAZIONE"]);
+          if(!seen.has(key)){
+            seen.add(key);
+            uniq.push(r);
+          }
+        }
+
+        openModal("Informazioni", `
+          <div class="kv">
+            <div class="k">JOIN</div>
+            <div class="v">CATEGORIA ${escapeHtml(indCat)} — CLASSE ${escapeHtml(indCls)}</div>
+          </div>
+          ${buildTipologiaTable(uniq)}
+        `);
+      });
+
+      frag.appendChild(row);
+    });
+
+    resultsEl.appendChild(frag);
+
+    const first = pairs[0];
+    updateExamples(first.indCat, first.indCls);
+  }
+
+  function doSearch(){
+    statusEl.textContent = "";
+    hideAutocomplete();
+    clearSearchUI();
+
+    if(!fascicoliRows){
+      statusEl.textContent = "DB non caricato. Apri via http:// e assicurati che db.xlsx sia nella stessa cartella.";
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Database non caricato.";
+      return;
+    }
+
+    const input = qEl.value.trim();
+    if(!input){
+      statusEl.textContent = "Inserisci un valore.";
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Inserisci un valore per vedere esempi.";
+      return;
+    }
+
+    if(normalize(input) !== normalize(lastExactValue)){
+      exactMode = false;
+    }
+
+    let matched = [];
+
+    if(exactMode){
+      const needle = normalize(input);
+      matched = fascicoliRows.filter(r => normalize(r["FASCICOLO"]) === needle);
+      render(groupPairsWithInd(matched), input);
+      return;
+    }
+
+    const terms = splitTerms(input).map(t => t.toLowerCase());
+    matched = fascicoliRows.filter(r=>{
+      const text = normalize(r["FASCICOLO"]) + " " + normalize(r["SOTTOFASCICOLO"]);
+      return terms.some(t => text.includes(t));
+    });
+
+    render(groupPairsWithInd(matched), input);
+  }
+
+  // Events
+  btnSearch.addEventListener("click", doSearch);
+
+  qEl.addEventListener("input", ()=>{
+    exactMode = false;
+    updateAutocomplete();
   });
 
-  // Svuoto e riempio il datalist
-  dl.innerHTML = "";
-  [...set]
-    .sort((a,b) => a.localeCompare(b, "it", { sensitivity: "base" }))
-    .forEach(val => {
-      const opt = document.createElement("option");
-      opt.value = val;
-      dl.appendChild(opt);
-    });
-}
-</script>
+  qEl.addEventListener("keydown", (e)=>{
+    const panelOpen = acPanel.style.display === "block";
 
+    if(panelOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")){
+      e.preventDefault();
+      if(e.key === "ArrowDown") setActive(Math.min(acActive + 1, acShown.length - 1));
+      if(e.key === "ArrowUp") setActive(Math.max(acActive - 1, 0));
+      return;
+    }
+
+    if(e.key === "Escape" && panelOpen){
+      hideAutocomplete();
+      return;
+    }
+
+    if(e.key === "Enter"){
+      e.preventDefault();
+      if(panelOpen && acActive >= 0){
+        applyAutocomplete(acActive);
+        return;
+      }
+      doSearch();
+    }
+  });
+
+  document.addEventListener("click", (e)=>{
+    if(!acPanel.contains(e.target) && e.target !== qEl) hideAutocomplete();
+  });
+
+  /***********************
+   * LOAD db.xlsx
+   ***********************/
+  async function loadDbXlsx(){
+    try{
+      const res = await fetch("db.xlsx", { cache:"no-store" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+
+      const buf = await res.arrayBuffer();
+      const wb = XLSX.read(buf, { type:"array" });
+
+      const sheetF = wb.SheetNames.find(n=>n.toLowerCase().trim()==="fascicoli") || wb.SheetNames[0];
+      fascicoliRows = XLSX.utils.sheet_to_json(wb.Sheets[sheetF], { defval:"" });
+
+      if(!fascicoliRows.length){
+        statusEl.textContent = 'Il foglio "fascicoli" è vuoto.';
+        examplesContent.className = "examples-empty";
+        examplesContent.textContent = "Il foglio fascicoli è vuoto.";
+        return;
+      }
+
+      const sheetT = wb.SheetNames.find(n=>{
+        const k = n.toLowerCase().trim();
+        return k === "tipologia" || k === "tilologia";
+      });
+      tipologiaRows = sheetT ? XLSX.utils.sheet_to_json(wb.Sheets[sheetT], { defval:"" }) : [];
+
+      const neededF = ["FASCICOLO","SOTTOFASCICOLO","CATEGORIA","CLASSE","IND_CATEGORIA","IND_CLASSE"];
+      const missingF = neededF.filter(c => !(c in fascicoliRows[0]));
+      if(missingF.length){
+        statusEl.textContent = 'Colonne mancanti in "fascicoli": ' + missingF.join(", ");
+        examplesContent.className = "examples-empty";
+        examplesContent.textContent = "Colonne mancanti nel file db.xlsx.";
+        return;
+      }
+
+      buildFascicoliIndex(fascicoliRows);
+
+    }catch(err){
+      console.error(err);
+      statusEl.textContent = "Errore caricando db.xlsx. Apri via http:// (non file://) e metti db.xlsx nella stessa cartella.";
+      examplesContent.className = "examples-empty";
+      examplesContent.textContent = "Errore caricando db.xlsx.";
+    }
+  }
+
+  // Se già loggato, carica db
+  if(savedUserStr){
+    loadDbXlsx();
+  }
+</script>
 </body>
 </html>
