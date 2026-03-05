@@ -88,10 +88,12 @@
     /* ===== SEARCH ===== */
     .search-area{ max-width:1240px; margin:0 auto; padding:0 12px 8px; }
     .ac-wrap{ position:relative; }
-    .btn-search{
-      height:54px; border-radius:8px; width:100%;
-      font-weight:900; font-size:18px; background:var(--brand); border:1px solid var(--brand);
-    }
+	
+.btn-search{
+  height:38px;
+  padding:6px 12px;
+  font-size:16px;
+}
     .meta{ color:#6b7280; font-size:13px; margin-top:8px; }
     .status{ margin-top:6px; font-size:13px; }
 
@@ -107,9 +109,15 @@
     .result-row:hover{ background:#fbfcff; }
 
     .pill{
-      display:inline-flex; align-items:center;
-      padding:6px 12px; border-radius:999px;
-      color:#fff; font-weight:900; line-height:1; font-size:14px; white-space:nowrap;
+      display:inline-flex; 
+	  align-items:center;
+      padding:10px 18px; 
+	  border-radius:999px;
+      color:#fff; 
+	  font-weight:900; 
+	  line-height:1; 
+	  font-size:14px; 
+	  white-space:nowrap;
     }
     .pill-cat{ background:var(--pillCat); }
     .pill-cls{ background:var(--pillCls); }
@@ -833,9 +841,7 @@
   function render(pairs, label){
     clearSearchUI();
 
-    metaEl.innerHTML = pairs.length
-      ? `Trovati <strong>${pairs.length}</strong> risultati per: <strong>${escapeHtml(label)}</strong>`
-      : "";
+metaEl.innerHTML = "";
 
     if(!pairs.length){
       resultsEl.innerHTML = `
@@ -858,8 +864,8 @@
       row.className = "result-row";
 
       row.innerHTML = `
-        <div class="pill pill-cat">Categoria: ${escapeHtml(p.cat)}</div>
-        <div class="pill pill-cls">Classe: ${escapeHtml(p.cls)}</div>
+        <div class="pill pill-cat">CATEGORIA: ${escapeHtml(p.cat)}</div>
+        <div class="pill pill-cls">CLASSE: ${escapeHtml(p.cls)}</div>
         <div class="spacer"></div>
         <button class="btn btn-outline-primary btn-info-mini" type="button">Informazioni</button>
       `;
