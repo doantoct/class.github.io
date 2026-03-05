@@ -295,6 +295,87 @@
       .topbar-user .who{ max-width: 55vw; }
       .examples-group{ text-align:left; }
     }
+
+/* ===== TOPBAR MOBILE MINIMAL ===== */
+@media (max-width:576px){
+
+  .topbar{
+    margin-top:10px;
+    justify-content:flex-end;
+  }
+
+  .topbar-user{
+    padding:6px 8px;
+    gap:8px;
+    box-shadow: none;
+    border-radius:12px;
+    max-width: 92vw;
+  }
+
+  .topbar-user .who{
+    font-size:13px;
+    font-weight:800;
+    max-width: 58vw;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .btn-logout{
+    padding:6px 10px;
+    font-size:0;     /* nasconde la scritta "Logout" */
+    line-height:1;
+    border-radius:10px;
+  }
+  .btn-logout::before{
+    content:"⎋";
+    font-size:16px;
+  }
+}	
+
+
+/* ===== USER ICON MENU ===== */
+
+.user-menu{
+  position:relative;
+}
+
+.user-icon{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: var(--shadow);
+}
+
+.user-dropdown{
+  position:absolute;
+  right:0;
+  top:52px;
+  width:220px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow: var(--shadow);
+  padding:12px;
+  display:none;
+  z-index:100;
+}
+
+.user-dropdown.show{
+  display:block;
+}
+
+.user-name{
+  font-weight:900;
+  font-size:14px;
+  color:#111827;
+  word-break:break-word;
+}
   </style>
 </head>
 
@@ -332,12 +413,30 @@
 
   <!-- ===================== APP VIEW ===================== -->
   <section id="appView" style="display:none;">
-    <div class="topbar" aria-label="Barra utente">
-      <div class="topbar-user">
-        <span class="who" id="loggedWho">—</span>
-        <button id="btnLogout" class="btn btn-outline-primary btn-logout" type="button">Logout</button>
-      </div>
+  
+  
+<div class="topbar" aria-label="Barra utente">
+
+  <div class="user-menu">
+    
+    <button id="userIcon" class="user-icon" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 8a3 3 0 1 0-0-6 3 3 0 0 0 0 6zm3.5 1a4.5 4.5 0 0 1 4.5 4.5v.5H0v-.5A4.5 4.5 0 0 1 4.5 9h7z"/>
+      </svg>
+    </button>
+
+    <div id="userDropdown" class="user-dropdown">
+      <div class="user-name" id="loggedWho">—</div>
+      <button id="btnLogout" class="btn btn-outline-primary w-100 mt-2">Logout</button>
     </div>
+
+  </div>
+
+</div>
+
+
+
+
 
     <div class="hero">
       <div class="logo-wrap" aria-label="Logo">
@@ -440,6 +539,19 @@
 
   const logoHome = document.getElementById("logoHome");
   const logoLogin = document.getElementById("logoLogin");
+  
+  const userIcon = document.getElementById("userIcon");
+const userDropdown = document.getElementById("userDropdown");
+
+userIcon.addEventListener("click", ()=>{
+  userDropdown.classList.toggle("show");
+});
+
+document.addEventListener("click",(e)=>{
+  if(!userIcon.contains(e.target) && !userDropdown.contains(e.target)){
+    userDropdown.classList.remove("show");
+  }
+});
 
   /***********************
    * STATE
