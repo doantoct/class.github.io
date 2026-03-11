@@ -886,7 +886,7 @@
 
   /***********************
    * ESEMPI DI FASCICOLAZIONE
-   * SE TIPO = protocollo -> "Esempio a breve disponibile"
+   * SE TIPO = protocollo -> "In lavorazione, a breve disponibile"
    ***********************/
   function updateExamples(indCat, indCls, searchText = ""){
     if(!fascicoliRows || !fascicoliRows.length){
@@ -923,7 +923,7 @@
       examplesContent.className = "";
       examplesContent.innerHTML = `
         <div class="examples-protocollo-box">
-          <div class="examples-protocollo-title">Esempio disponibile e contattaci</div>
+          <div class="examples-protocollo-title">In lavorazione, a breve disponibile</div>
           <a class="btn btn-primary"
              href="${getWhatsappUrl()}"
              target="_blank"
