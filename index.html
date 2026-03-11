@@ -56,30 +56,6 @@
       max-width:1240px; margin:16px auto 0; padding:0 12px;
       display:flex; align-items:center; justify-content:flex-end; gap:12px;
     }
-    .topbar-user{
-      display:flex; align-items:center; gap:10px;
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:999px;
-      padding: 8px 10px;
-      box-shadow: var(--shadow);
-      font-weight:800;
-      color:#111827;
-      max-width:100%;
-    }
-    .topbar-user .who{
-      font-weight:900;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 70vw;
-    }
-    .btn-logout{
-      border-radius:999px;
-      font-weight:900;
-      padding: 6px 10px;
-      white-space:nowrap;
-    }
 
     /* ===== HERO ===== */
     .hero{ max-width:1240px; margin:0 auto; text-align:center; padding:24px 12px 0; }
@@ -94,6 +70,7 @@
       padding:6px 12px;
       font-size:16px;
     }
+
     .meta{ color:#6b7280; font-size:13px; margin-top:8px; }
     .status{ margin-top:6px; font-size:13px; }
 
@@ -131,12 +108,18 @@
     }
 
     .nores{
-      background:#fff; border:1px solid var(--border); border-radius:14px;
-      margin:0 8px 10px; padding:10px 12px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px; flex-wrap:wrap; box-shadow: var(--shadow);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      margin:0 8px 10px;
+      padding:10px 12px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      gap:10px;
+      box-shadow: var(--shadow);
     }
-    .nores .btn{ padding:8px 12px; font-weight:900; border-radius:8px; }
 
     /* ===== AUTOCOMPLETE ===== */
     .ac-panel{
@@ -148,11 +131,10 @@
     .ac-item{ padding:10px 12px; font-size:15px; cursor:pointer; border-bottom:1px solid #f1f3f6; }
     .ac-item:last-child{ border-bottom:0; }
     .ac-item:hover, .ac-item.active{ background:#f3f7ff; }
-    .ac-muted{ color:#6b7280; font-size:12px; margin-top:2px; }
     .ac-bold{ font-weight:900; }
     .hl{ background:#fff3cd; border-radius:4px; padding:0 2px; }
 
-    /* ===== POPUP (scrollabile) ===== */
+    /* ===== POPUP ===== */
     .modal-backdrop-custom{
       position:fixed; inset:0;
       background: rgba(0,0,0,.45);
@@ -229,7 +211,7 @@
     }
     .mini-table tr:last-child td{ border-bottom:0; }
 
-    /* ===== ESEMPI (CENTRATI) ===== */
+    /* ===== ESEMPI ===== */
     .examples-section{
       max-width:1240px;
       margin: 10px auto 40px;
@@ -288,61 +270,6 @@
       font-size:14px;
     }
 
-    @media (max-width:576px){
-      .pill{
-        font-size:20px;
-        padding:14px 18px;
-        width:100%;
-        justify-content:center;
-        text-align:center;
-        white-space:normal;
-        line-height:1.3;
-      }
-
-      .btn-info-mini{
-        width:100%;
-        justify-content:center;
-      }
-
-      .spacer{ display:none; }
-    }
-
-    /* ===== TOPBAR MOBILE MINIMAL ===== */
-    @media (max-width:576px){
-      .topbar{
-        margin-top:10px;
-        justify-content:flex-end;
-      }
-
-      .topbar-user{
-        padding:6px 8px;
-        gap:8px;
-        box-shadow: none;
-        border-radius:12px;
-        max-width: 92vw;
-      }
-
-      .topbar-user .who{
-        font-size:13px;
-        font-weight:800;
-        max-width: 58vw;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
-      }
-
-      .btn-logout{
-        padding:6px 10px;
-        font-size:0;
-        line-height:1;
-        border-radius:10px;
-      }
-      .btn-logout::before{
-        content:"⎋";
-        font-size:16px;
-      }
-    }
-
     /* ===== USER ICON MENU ===== */
     .user-menu{
       position:relative;
@@ -383,6 +310,43 @@
       font-size:14px;
       color:#111827;
       word-break:break-word;
+    }
+
+    @media (max-width:576px){
+      .pill{
+        font-size:20px;
+        padding:14px 18px;
+        width:100%;
+        justify-content:center;
+        text-align:center;
+        white-space:normal;
+        line-height:1.3;
+      }
+
+      .btn-info-mini{
+        width:100%;
+        justify-content:center;
+      }
+
+      .spacer{ display:none; }
+    }
+
+    @media (max-width:576px){
+      .topbar{
+        margin-top:10px;
+        justify-content:flex-end;
+      }
+
+      .btn-logout{
+        padding:6px 10px;
+        font-size:0;
+        line-height:1;
+        border-radius:10px;
+      }
+      .btn-logout::before{
+        content:"⎋";
+        font-size:16px;
+      }
     }
   </style>
 </head>
@@ -433,7 +397,7 @@
 
         <div id="userDropdown" class="user-dropdown">
           <div class="user-name" id="loggedWho">—</div>
-          <button id="btnLogout" class="btn btn-outline-primary w-100 mt-2">Logout</button>
+          <button id="btnLogout" class="btn btn-outline-primary w-100 mt-2" type="button">Logout</button>
         </div>
 
       </div>
@@ -503,28 +467,36 @@
       .replaceAll('"',"&quot;")
       .replaceAll("'","&#039;");
   }
-  function normalize(s){ return (s ?? "").toString().toLowerCase().trim(); }
-  function splitTerms(q){ return q.split(/[,]+|\s+/g).map(t=>t.trim()).filter(Boolean); }
+
+  function normalize(s){
+    return (s ?? "").toString().toLowerCase().trim();
+  }
+
+  function splitTerms(q){
+    return q.split(/[,]+|\s+/g).map(t => t.trim()).filter(Boolean);
+  }
+
   function isValidEmailBasic(s){
     return typeof s === "string" && s.includes("@") && s.indexOf("@") > 0 && s.indexOf("@") < s.length - 1;
   }
 
-  // ✅ NUOVO: Autocomplete più selettivo (molti meno suggerimenti)
-  // - parte solo da 3 caratteri
-  // - match se il fascicolo inizia con typed
-  //   oppure se una parola del fascicolo inizia con typed
-  function acMatchFascicolo(fascicolo, typed){
-    const t = normalize(typed);
-    if(t.length < 3) return false;
+  function cleanSearchText(s){
+    return (s ?? "")
+      .toString()
+      .toLowerCase()
+      .replace(/[;,\.\-_]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
-    const s = normalize(fascicolo);
+  function rowMatchesExactSearch(row, searchText){
+    const q = cleanSearchText(searchText);
+    if(!q) return true;
 
-    // 1) Inizia con ciò che scrivi
-    if(s.startsWith(t)) return true;
+    const fascicolo = cleanSearchText(row["FASCICOLO"] ?? "");
+    const sottofascicolo = cleanSearchText(row["SOTTOFASCICOLO"] ?? "");
 
-    // 2) Una parola del fascicolo inizia con ciò che scrivi
-    const parts = s.split(/[\s\/\-\.\(\)\[\],;:]+/g).filter(Boolean);
-    return parts.some(p => p.startsWith(t));
+    return fascicolo === q || sottofascicolo === q;
   }
 
   /***********************
@@ -561,6 +533,22 @@
   const userIcon = document.getElementById("userIcon");
   const userDropdown = document.getElementById("userDropdown");
 
+  /***********************
+   * STATE
+   ***********************/
+  let utentiRows = null;
+  let fascicoliRows = null;
+  let tipologiaRows = null;
+
+  let fascicoliList = [];
+  let acShown = [];
+  let acActive = -1;
+  let exactMode = false;
+  let lastExactValue = "";
+
+  /***********************
+   * USER MENU
+   ***********************/
   userIcon.addEventListener("click", ()=>{
     userDropdown.classList.toggle("show");
   });
@@ -570,20 +558,6 @@
       userDropdown.classList.remove("show");
     }
   });
-
-  /***********************
-   * STATE
-   ***********************/
-  let utentiRows = null;
-  let fascicoliRows = null;
-  let tipologiaRows = null;
-
-  // Autocomplete
-  let fascicoliList = [];
-  let acShown = [];
-  let acActive = -1;
-  let exactMode = false;
-  let lastExactValue = "";
 
   /***********************
    * VIEW HELPERS
@@ -666,6 +640,7 @@
 
   async function doLogin(){
     loginStatus.textContent = "";
+
     const email = (loginMail.value || "").trim();
     const pass  = (loginPass.value || "").toString();
 
@@ -673,6 +648,7 @@
       loginStatus.textContent = "Inserisci mail e password.";
       return;
     }
+
     if(!isValidEmailBasic(email)){
       loginStatus.textContent = "Mail non valida: deve contenere il carattere '@'.";
       return;
@@ -760,7 +736,10 @@
     acPanel.innerHTML = "";
     acShown = items;
     acActive = -1;
-    if(!items.length){ acPanel.style.display = "none"; return; }
+    if(!items.length){
+      acPanel.style.display = "none";
+      return;
+    }
 
     items.forEach((txt, idx)=>{
       const div = document.createElement("div");
@@ -809,28 +788,30 @@
     doSearch();
   }
 
-  // ✅ MODIFICATA: ora molto più selettiva
-function updateAutocomplete(){
-  if(!fascicoliList.length){ hideAutocomplete(); return; }
+  function updateAutocomplete(){
+    if(!fascicoliList.length){
+      hideAutocomplete();
+      return;
+    }
 
-  const typed = qEl.value.trim();
-  const q = normalize(typed);
+    const typed = qEl.value.trim();
+    const q = normalize(typed);
 
-  // puoi mettere 2 o 3; con 2 vedi prima i suggerimenti
-  if(q.length < 2){ hideAutocomplete(); return; }
+    if(q.length < 2){
+      hideAutocomplete();
+      return;
+    }
 
-  // match largo: contiene la stringa digitata
-  const hits = fascicoliList
-    .filter(x => normalize(x).includes(q));   // <-- qui ti torna anche "protocollo"
+    const hits = fascicoliList.filter(x => normalize(x).includes(q));
+    showAutocomplete(hits, typed);
+  }
 
-  // mostra TUTTI i risultati trovati (scroll già attivo nel pannello)
-  showAutocomplete(hits, typed);
-}
   /***********************
    * SEARCH / RENDER
    ***********************/
   function groupPairsWithInd(matchedRows){
     const map = new Map();
+
     for(const r of matchedRows){
       const cat = (r["CATEGORIA"] || "(CATEGORIA vuota)").toString().trim();
       const cls = (r["CLASSE"] || "(CLASSE vuota)").toString().trim();
@@ -883,7 +864,11 @@ function updateAutocomplete(){
     );
   }
 
-  function updateExamples(indCat, indCls){
+  /***********************
+   * ESEMPI DI FASCICOLAZIONE
+   * FILTRO ESATTO SUL TESTO CERCATO
+   ***********************/
+  function updateExamples(indCat, indCls, searchText = ""){
     if(!fascicoliRows || !fascicoliRows.length){
       examplesContent.className = "examples-empty";
       examplesContent.textContent = "Database non caricato.";
@@ -899,49 +884,52 @@ function updateAutocomplete(){
     const a = normalize(indCat);
     const b = normalize(indCls);
 
-    const filtered = fascicoliRows.filter(r =>
+    let filtered = fascicoliRows.filter(r =>
       normalize(r["IND_CATEGORIA"]) === a &&
       normalize(r["IND_CLASSE"]) === b
     );
 
+    filtered = filtered.filter(r => rowMatchesExactSearch(r, searchText));
+
     if(!filtered.length){
       examplesContent.className = "examples-empty";
-      examplesContent.textContent = "Nessun esempio trovato per questa categoria/classe.";
+      examplesContent.textContent = "Nessun esempio trovato con il testo inserito nella ricerca.";
       return;
     }
 
-const map = new Map();       // fascicolo -> set di sottofascicoli
-const tipoByF = new Map();   // fascicolo -> valore colonna TIPO
+    const map = new Map();
+    const tipoByF = new Map();
 
-for(const r of filtered){
-  const f = (r["FASCICOLO"] ?? "").toString().trim() || "(vuoto)";
-  const s = (r["SOTTOFASCICOLO"] ?? "").toString().trim();
+    for(const r of filtered){
+      const f = (r["FASCICOLO"] ?? "").toString().trim() || "(vuoto)";
+      const s = (r["SOTTOFASCICOLO"] ?? "").toString().trim();
+      const tipo = (r["TIPO"] ?? "").toString().trim() || "Fascicolo";
 
-  // prende TIPO dal file excel (se vuoto, fallback a "Fascicolo")
-  const tipo = (r["TIPO"] ?? "").toString().trim() || "Fascicolo";
-  if(!tipoByF.has(f)) tipoByF.set(f, tipo);
+      if(!tipoByF.has(f)) tipoByF.set(f, tipo);
+      if(!map.has(f)) map.set(f, new Set());
+      if(s) map.get(f).add(s);
+    }
 
-  if(!map.has(f)) map.set(f, new Set());
-  if(s) map.get(f).add(s);
-}
     const fascicoli = [...map.keys()].sort((x,y)=>x.localeCompare(y,"it"));
 
     examplesContent.className = "";
     examplesContent.innerHTML = fascicoli.map(f=>{
       const sottos = [...map.get(f)].sort((x,y)=>x.localeCompare(y,"it"));
+      const tipo = tipoByF.get(f) || "Fascicolo";
 
       if(!sottos.length){
         return `
           <div class="examples-group">
-            <div class="examples-fascicolo"><strong>${escapeHtml(tipoByF.get(f) || "Fascicolo")}:</strong> ${escapeHtml(f)}</div>
+            <div class="examples-fascicolo"><strong>${escapeHtml(tipo)}:</strong> ${escapeHtml(f)}</div>
           </div>
         `;
       }
 
       const li = sottos.map(s => `<li><strong>Sottofascicolo:</strong> ${escapeHtml(s)}</li>`).join("");
+
       return `
         <div class="examples-group">
-          <div class="examples-fascicolo"><strong>Fascicolo:</strong> ${escapeHtml(f)}</div>
+          <div class="examples-fascicolo"><strong>${escapeHtml(tipo)}:</strong> ${escapeHtml(f)}</div>
           <div class="examples-sotto"><ul>${li}</ul></div>
         </div>
       `;
@@ -968,13 +956,29 @@ for(const r of filtered){
 
     if(!pairs.length){
       resultsEl.innerHTML = `
-        <div class="nores">
-          <div class="fw-bold">Nessun risultato trovato</div>
-          <a class="btn btn-primary" href="https://immediaspa.com/area_clienti/" target="_blank" rel="noopener">
-            Contatta il nostro consulente
-          </a>
+        <div class="nores text-center">
+          <div class="fw-bold mb-4">Nessun risultato trovato</div>
+
+          <div class="mb-2">
+            <a class="btn btn-primary"
+               href="https://immediaspa.com/area_clienti/"
+               target="_blank"
+               rel="noopener">
+               Contattaci sull' x-desk
+            </a>
+          </div>
+
+          <div>
+            <a class="btn btn-primary"
+               href="https://wa.me/393284908982?text=Buongiorno%2C%20sto%20consultando%20la%20fascicolazione%20ma%20non%20riesco%20a%20trovare%20alcuni%20argomenti%20di%20cui%20avrei%20bisogno.%20Potreste%20gentilmente%20fornirmi%20assistenza%20o%20indicarmi%20dove%20posso%20reperirli%3F"
+               target="_blank"
+               rel="noopener">
+               Contattaci su Whatsapp
+            </a>
+          </div>
         </div>
       `;
+
       examplesContent.className = "examples-empty";
       examplesContent.textContent = "Nessun risultato: passa su un risultato quando disponibile.";
       return;
@@ -994,11 +998,11 @@ for(const r of filtered){
       `;
 
       row.addEventListener("mouseenter", ()=>{
-        updateExamples(p.indCat, p.indCls);
+        updateExamples(p.indCat, p.indCls, qEl.value.trim());
       });
 
       row.querySelector("button").addEventListener("click", ()=>{
-        updateExamples(p.indCat, p.indCls);
+        updateExamples(p.indCat, p.indCls, qEl.value.trim());
 
         const indCat = (p.indCat || "").toString().trim();
         const indCls = (p.indCls || "").toString().trim();
@@ -1054,7 +1058,7 @@ for(const r of filtered){
     resultsEl.appendChild(frag);
 
     const first = pairs[0];
-    updateExamples(first.indCat, first.indCls);
+    updateExamples(first.indCat, first.indCls, qEl.value.trim());
   }
 
   function doSearch(){
