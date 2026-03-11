@@ -108,16 +108,16 @@
     }
 
     .nores{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:14px;
-      margin:0 8px 10px;
-      padding:10px 12px;
       display:flex;
       flex-direction:column;
       align-items:center;
       text-align:center;
       gap:10px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      margin:0 8px 10px;
+      padding:10px 12px;
       box-shadow: var(--shadow);
     }
 
@@ -270,6 +270,22 @@
       font-size:14px;
     }
 
+    .examples-protocollo-box{
+      max-width:920px;
+      margin:0 auto;
+      padding:18px;
+      border:1px solid #eef2f6;
+      border-radius:12px;
+      background:#fafbfd;
+      text-align:center;
+    }
+    .examples-protocollo-title{
+      font-size:18px;
+      font-weight:900;
+      color:#111827;
+      margin-bottom:12px;
+    }
+
     /* ===== USER ICON MENU ===== */
     .user-menu{
       position:relative;
@@ -388,7 +404,6 @@
 
     <div class="topbar" aria-label="Barra utente">
       <div class="user-menu">
-
         <button id="userIcon" class="user-icon" type="button">
           <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
             <path d="M8 8a3 3 0 1 0-0-6 3 3 0 0 0 0 6zm3.5 1a4.5 4.5 0 0 1 4.5 4.5v.5H0v-.5A4.5 4.5 0 0 1 4.5 9h7z"/>
@@ -399,7 +414,6 @@
           <div class="user-name" id="loggedWho">—</div>
           <button id="btnLogout" class="btn btn-outline-primary w-100 mt-2" type="button">Logout</button>
         </div>
-
       </div>
     </div>
 
@@ -473,7 +487,7 @@
   }
 
   function splitTerms(q){
-    return q.split(/[,]+|\s+/g).map(t => t.trim()).filter(Boolean);
+    return q.split(/[,]+|\s+/g).map(t=>t.trim()).filter(Boolean);
   }
 
   function isValidEmailBasic(s){
@@ -497,6 +511,15 @@
     const sottofascicolo = cleanSearchText(row["SOTTOFASCICOLO"] ?? "");
 
     return fascicolo === q || sottofascicolo === q;
+  }
+
+  function isProtocolloTipo(row){
+    const tipo = normalize(row["TIPO"] ?? "");
+    return tipo === "protocollo";
+  }
+
+  function getWhatsappUrl(){
+    return "https://wa.me/393284908982?text=Buongiorno%2C%20sto%20consultando%20la%20fascicolazione%20ma%20non%20riesco%20a%20trovare%20alcuni%20argomenti%20di%20cui%20avrei%20bisogno.%20Potreste%20gentilmente%20fornirmi%20assistenza%20o%20indicarmi%20dove%20posso%20reperirli%3F";
   }
 
   /***********************
@@ -640,7 +663,6 @@
 
   async function doLogin(){
     loginStatus.textContent = "";
-
     const email = (loginMail.value || "").trim();
     const pass  = (loginPass.value || "").toString();
 
@@ -648,7 +670,6 @@
       loginStatus.textContent = "Inserisci mail e password.";
       return;
     }
-
     if(!isValidEmailBasic(email)){
       loginStatus.textContent = "Mail non valida: deve contenere il carattere '@'.";
       return;
@@ -811,7 +832,6 @@
    ***********************/
   function groupPairsWithInd(matchedRows){
     const map = new Map();
-
     for(const r of matchedRows){
       const cat = (r["CATEGORIA"] || "(CATEGORIA vuota)").toString().trim();
       const cls = (r["CLASSE"] || "(CLASSE vuota)").toString().trim();
@@ -866,7 +886,7 @@
 
   /***********************
    * ESEMPI DI FASCICOLAZIONE
-   * FILTRO ESATTO SUL TESTO CERCATO
+   * SE TIPO = protocollo -> "Esempio a breve disponibile"
    ***********************/
   function updateExamples(indCat, indCls, searchText = ""){
     if(!fascicoliRows || !fascicoliRows.length){
@@ -894,6 +914,24 @@
     if(!filtered.length){
       examplesContent.className = "examples-empty";
       examplesContent.textContent = "Nessun esempio trovato con il testo inserito nella ricerca.";
+      return;
+    }
+
+    const hasProtocolloTipo = filtered.some(r => isProtocolloTipo(r));
+
+    if(hasProtocolloTipo){
+      examplesContent.className = "";
+      examplesContent.innerHTML = `
+        <div class="examples-protocollo-box">
+          <div class="examples-protocollo-title">Esempio disponibile e contattaci</div>
+          <a class="btn btn-primary"
+             href="${getWhatsappUrl()}"
+             target="_blank"
+             rel="noopener">
+             Contattaci su Whatsapp
+          </a>
+        </div>
+      `;
       return;
     }
 
@@ -970,7 +1008,7 @@
 
           <div>
             <a class="btn btn-primary"
-               href="https://wa.me/393284908982?text=Buongiorno%2C%20sto%20consultando%20la%20fascicolazione%20ma%20non%20riesco%20a%20trovare%20alcuni%20argomenti%20di%20cui%20avrei%20bisogno.%20Potreste%20gentilmente%20fornirmi%20assistenza%20o%20indicarmi%20dove%20posso%20reperirli%3F"
+               href="${getWhatsappUrl()}"
                target="_blank"
                rel="noopener">
                Contattaci su Whatsapp
@@ -1167,7 +1205,7 @@
       });
       tipologiaRows = sheetT ? XLSX.utils.sheet_to_json(wb.Sheets[sheetT], { defval:"" }) : [];
 
-      const neededF = ["FASCICOLO","SOTTOFASCICOLO","CATEGORIA","CLASSE","IND_CATEGORIA","IND_CLASSE"];
+      const neededF = ["FASCICOLO","SOTTOFASCICOLO","CATEGORIA","CLASSE","IND_CATEGORIA","IND_CLASSE","TIPO"];
       const missingF = neededF.filter(c => !(c in fascicoliRows[0]));
       if(missingF.length){
         statusEl.textContent = 'Colonne mancanti in "fascicoli": ' + missingF.join(", ");
