@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Test log fetch</title>
+</head>
+<body>
+
+<button onclick="testLog()">Invia log</button>
+
+<script>
+async function testLog(){
+
+  const formData = new FormData();
+
+  formData.append("ente","Comune Test");
+  formData.append("user","Mario Rossi");
+  formData.append("ricerca","permesso edilizio");
+
+  const res = await fetch("log_search.php",{
+    method:"POST",
+    body:formData
+  });
+
+  const txt = await res.text();
+
+  console.log(txt);
+  alert(txt);
+
+}
+</script>
+
+</body>
+</html>
